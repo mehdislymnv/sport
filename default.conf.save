@@ -1,0 +1,158 @@
+Copy the following contents into the file and save it:
+
+upstream index_php_upstream {
+    server 127.0.0.1:8090; # NGINX Unit backend address for index.php with
+                           # 'script' parameter
+}
+
+upstream direct_php_upstream {
+    server 127.0.0.1:8091; # NGINX Unit backend address for generic PHP file handling
+}
+
+server {
+    listen      80;
+    server_name localhost;
+    root        /var/www/wordpress/;
+
+    location / {
+        try_files $uri @index_php;
+    }
+
+    location @index_php {
+        proxy_pass       http://index_php_upstream;
+        proxy_set_header Host $host;
+    }
+
+    location /wp-admin {
+        index index.php;
+    }
+
+    location ~* .php$ {
+        try_files        $uri =404;
+        proxy_pass       http://direct_php_upstream;
+        proxy_set_header Host $host;
+    }
+}
+The first location block handles requests for the root URL (/). The try_files directive searches for the exact URI. If it doesn’t exist, the request is sent to the second, named location @index_php, which proxies it to the index_php_upstream upstream group.
+
+The third location block handles requests for /wp-admin and serves the index.php file directly. This location does not need to handle URLs that aren’t found.
+
+The last location block handles requests for the .php extension, which match the regular expression. It proxies the requests to the index_php_upstream upstream group, where the generic NGINX Unit application handles all PHP requests directly. The try_files directive handles 404 errors by displaying a page generated directly by NGINX. Another option is to let WordPress handle 404 errors, by replacing =404 with @index_php.
+
+For security purposes, or for segregating traffic further, you can include additional location blocks and different parameters to the try_files directive.
+
+Verify that the main /etc/nginx/nginx.conf configuration file has an include directive that reads in files from the /etc/nginx/conf.d directory:
+
+include /etc/nginx/conf.d/*.conf;
+Run this command to verify that the configuration is syntactically valid:
+
+$ sudo nginx -t
+Reload the configuration:
+
+$ sudo nginx -s reload
+In a web browser, navigate to the IP address or hostname of your WordPress site and complete the installation:
+
+
+
+You’re all set! You now have WordPress up and running in a “LEMU” stack with NGINX and NGINX Unit.
+
+Enhanced Capabilities in NGINX Plus
+To get the most out of your WordPress application, we recommend NGINX Plus for its enhanced features, such as application health checks, sophisticated caching of both static and dynamic content, and live activity monitoring. These features are especially beneficial if you have multiple WordPress servers and require load balancing. And they work well with NGINX Unit; the image below shows the live activity monitoring dashboard on an NGINX Plus instance that is load balancing three NGINX Unit servers.
+
+
+
+For details about all the great features in NGINX Plus, see the product page. To try it in your WordPress environment, start your free 30-day trial today or contact us.
+
+Webinar: Optimize Application Execution with NGINX Unit
+Cover image
+The application server that speaks your language
+
+WATCH NOW
+
+ABOUT NGINX
+F5, Inc. is the company behind NGINX, the popular open source project. We offer a suite of technologies for developing and delivering modern applications. Together with F5, our combined solution bridges the gap between NetOps and DevOps, with multi-cloud application services that span from code to customer.
+
+Learn more at nginx.com or join the conversation by following @nginx on Twitter.
+
+SEARCH
+CATEGORIES
+Events
+News
+Tech
+Opinion
+Partners
+More »
+TOP POSTS
+Creating NGINX Rewrite Rules
+Introduction to Microservices
+Building Microservices: Using an API Gateway
+Adopting Microservices at Netflix: Lessons for Architectural Design
+A Guide to Caching with NGINX and NGINX Plus
+STAY IN THE LOOP
+NGINX PLUS FREE TRIAL
+NGINX CONTROLLER FREE TRIAL
+ASK US A QUESTION
+Products
+NGINX Plus
+NGINX Controller
+NGINX Instance Manager
+NGINX App Protect
+NGINX Service Mesh
+NGINX Unit
+NGINX Amplify
+F5 DNS Cloud Services
+NGINX on Github
+NGINX Open Source
+NGINX Unit
+NGINX Amplify
+NGINX Kubernetes Ingress Controller
+NGINX Microservices Reference Architecture
+NGINX Crossplane
+Solutions
+ADC / Load Balancing
+Microservices
+Cloud
+Security
+Web & Mobile Performance
+API Management
+Resources
+Documentation
+Ebooks
+Webinars
+Datasheets
+Success Stories
+Blog
+FAQ
+Learn
+Glossary
+Support
+Professional Services
+Training
+Customer Portal Login
+Partners
+Amazon Web Services
+Google Cloud Platform
+IBM
+Microsoft Azure
+Red Hat
+Find a Partner
+Certified Module Program
+Company
+About NGINX
+Careers
+Leadership
+Press
+Events
+F5
+Shape Security
+Volterra
+Connect With Us
+facebook twitter linkedin NGINX Youtube Channel rss
+STAY IN THE LOOP
+Copyright © F5, Inc. All rights reserved.
+Trademarks | Policies | Privacy | California Privacy | Do Not Sell My Personal Information  | Cookie Choices
+
+
+Live chat:
+Chat with Codey
+

@@ -1,0 +1,5 @@
+/var/www/sport-wp/wp-content/themes/sprt
+/var/www/sport-wp/wp-content/themes/sprt/assets/css
+/var/www/sport-wp/wp-content/themes/sprt/assets/fonts
+/var/www/sport-wp/wp-content/themes/sprt/assets/images
+/var/www/sport-wp/wp-content/themes/sprt/assets/js
